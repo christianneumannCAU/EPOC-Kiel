@@ -3,20 +3,20 @@ clc; clear all; close all;
 %% prepare everything
 
 % path to folder with ICA weights
-path                = "C:\Users\chris\Desktop\EPOC\01_data\01_individual_data_after_ICA";
+path                = "C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\01_individual_data_after_ICA";
 
 % list of all .mat files
 data = dir(fullfile(path, '*.mat'));
 
-MAIN                = 'C:\Users\chris\Desktop\EPOC\';                       % paste path to EPOC folder
+MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';                       % paste path to EPOC folder
 cd(MAIN);                                                                   % go into EPOC folder
 
 epocPath            = genpath(MAIN);
-fieldtripPath       = genpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');
+fieldtripPath       = genpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');
 epocPath            = strrep(epocPath, fieldtripPath, '');                  % add fieldtrip seperately from the rest 
 
 addpath(epocPath);                                                          % add EPOC 
-addpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');      % and fieldtrip 
+addpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');      % and fieldtrip 
 
 PATHIN      = [MAIN '01_data\00_bids\'];
 PATHOUT     = [MAIN '01_data\'];
@@ -264,14 +264,14 @@ for i               = 1:length(data)
 
 end
 
-save('C:\Users\chris\Desktop\EPOC\01_data\topoplot_workspace.mat');
+save('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace.mat');
 
 %% ------------------------------------------------------------
 %  THETA
 % ------------------------------------------------------------
 
-load("C:\Users\chris\Desktop\EPOC\01_data\topoplot_workspace.mat");
-T_merged = readtable("C:\Users\chris\Desktop\EPOC\01_data\00_bids\participants.tsv", 'Delimiter', '\t', 'FileType','text');
+load("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace.mat");
+T_merged = readtable("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\00_bids\participants.tsv", 'Delimiter', '\t', 'FileType','text');
 
 used_ids = cellfun(@(x) x(1:end-4), {data.name}, 'UniformOutput',false);
 
@@ -309,7 +309,7 @@ col_theta_circle = [230 159 0]/255;  % #E69F00
 col_alpha_circle = [192 133 0]/255;  % #C08500
 
 cfg = [];
-load('C:\Users\chris\Desktop\EPOC\BC-128-pass-lay.mat');
+load('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\BC-128-pass-lay.mat');
 cfg.elec   = elec;
 cfg.layout = ft_prepare_layout(cfg);
 cfg.marker = 'on';
@@ -378,14 +378,21 @@ rectPos = [ leftFrame , bottomFrame , ...
 
 annotation('rectangle', rectPos, 'Color', col_theta_circle, 'LineWidth', 4)
 
+annotation('textbox', [0.12 0.965 0.6 0.03], ...
+    'String', 'Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post−COVID−19', ...
+    'HorizontalAlignment', 'center', ...
+    'EdgeColor', 'none', ...
+    'FontSize', 11, ...
+    'FontWeight', 'normal')
+
 h = colorbar('Position',[0.88 0.15 0.02 0.7]);
 ylabel(h,'Power (µV²)','FontSize',14)
 set(h,'FontSize',12)
 
-set(gcf,'Units','pixels','Position',[100 100 1350 1100])
-exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\03_figures\07_eeg_peaks\topo_theta.png','Resolution',300)
+set(gcf,'Units','pixels','Position',[100 100 2500 1800])
+exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_theta.png','Resolution',500)
 
-%saveas(gcf,['C:\Users\chris\Desktop\EPOC\03_figures\07_eeg_peaks' filesep 'topo_theta.png']);
+saveas(gcf,['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks' filesep 'topo_theta.png']);
 
 
 
@@ -394,7 +401,7 @@ exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\03_figures\07_eeg_peaks\topo_the
 % ------------------------------------------------------------
 
 cfg = [];
-load('C:\Users\chris\Documents\GitHub\EPOC\BC-128-pass-lay.mat');
+load('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\BC-128-pass-lay.mat');
 cfg.elec   = elec;
 cfg.layout = ft_prepare_layout(cfg);
 cfg.marker = 'on';
@@ -455,11 +462,18 @@ rectPos = [ leftFrame , bottomFrame , ...
 
 annotation('rectangle', rectPos, 'Color', col_alpha_circle, 'LineWidth', 4)
 
+annotation('textbox', [0.12 0.965 0.6 0.03], ...
+    'String', 'Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post−COVID−19', ...
+    'HorizontalAlignment', 'center', ...
+    'EdgeColor', 'none', ...
+    'FontSize', 11, ...
+    'FontWeight', 'normal')
+
 h = colorbar('Position',[0.88 0.15 0.02 0.7]);
 ylabel(h,'Power (µV²)','FontSize',14)
 set(h,'FontSize',12)
 
-set(gcf,'Units','pixels','Position',[100 100 1350 1100])
-exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\03_figures\07_eeg_peaks\topo_alpha.png','Resolution',300)
+set(gcf,'Units','pixels','Position',[100 100 2500 1800])
+exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_alpha.png','Resolution',500)
 
-%saveas(gcf,['C:\Users\chris\Desktop\EPOC\03_figures\07_eeg_peaks' filesep 'topo_alpha.png']);
+saveas(gcf,['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks' filesep 'topo_alpha.png']);

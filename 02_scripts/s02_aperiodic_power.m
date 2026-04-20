@@ -3,20 +3,20 @@ clc; clear all; close all;
 %% prepare everything
 
 % path to folder with ICA weights
-path                = "C:\Users\chris\Desktop\EPOC\01_data\01_individual_data_after_ICA";
+path                = "C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\01_individual_data_after_ICA";
 
 % list of all .mat files
 data = dir(fullfile(path, '*.mat'));
 
-MAIN                = 'C:\Users\chris\Desktop\EPOC\';                       % paste path to EPOC folder
+MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';                       % paste path to EPOC folder
 cd(MAIN);                                                                   % go into EPOC folder
 
 epocPath            = genpath(MAIN);
-fieldtripPath       = genpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');
+fieldtripPath       = genpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');
 epocPath            = strrep(epocPath, fieldtripPath, '');                  % add fieldtrip seperately from the rest 
 
 addpath(epocPath);                                                          % add EPOC 
-addpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');      % and fieldtrip 
+addpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');      % and fieldtrip 
 
 PATHIN      = [MAIN '01_data\00_bids\'];
 PATHOUT     = [MAIN '01_data\'];
@@ -244,7 +244,7 @@ for i               = 1:length(data)
     legend({'Single Trials', 'Mean'}, 'Location', 'northeast');
     grid on;
 
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\03_fooof_pvt' filesep sub '_prestim.png']); 
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\03_fooof_pvt' filesep sub '_prestim.png']); 
     close;
 
     % average and save aperiodic data
@@ -281,7 +281,7 @@ for i               = 1:length(data)
     xline(8, '--k', 'LineWidth', 0.8);
     xline(12, '--k', 'LineWidth', 0.8);
     grid on;
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\04_alpha_peak_pvt' filesep sub '_prestim.png']);
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\04_alpha_peak_pvt' filesep sub '_prestim.png']);
     close;
 
     % add theta
@@ -303,7 +303,7 @@ for i               = 1:length(data)
     xline(4, '--k', 'LineWidth', 0.8);
     xline(7, '--k', 'LineWidth', 0.8);
     grid on;
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\05_theta_peak_pvt' filesep sub '_prestim.png']);
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\05_theta_peak_pvt' filesep sub '_prestim.png']);
     close;
 
     % speichern
@@ -381,7 +381,7 @@ for i               = 1:length(data)
     legend({'Single Trials', 'Mean'}, 'Location', 'northeast');
     grid on;
 
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\03_fooof_pvt' filesep sub '_poststim.png']); 
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\03_fooof_pvt' filesep sub '_poststim.png']); 
     close;
 
     % average and save aperiodic data
@@ -418,7 +418,7 @@ for i               = 1:length(data)
     xline(8, '--k', 'LineWidth', 0.8);
     xline(12, '--k', 'LineWidth', 0.8);
     grid on;
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\04_alpha_peak_pvt' filesep sub '_poststim.png']);
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\04_alpha_peak_pvt' filesep sub '_poststim.png']);
     close;
 
     % add theta
@@ -440,7 +440,7 @@ for i               = 1:length(data)
     xline(4, '--k', 'LineWidth', 0.8);
     xline(7, '--k', 'LineWidth', 0.8);
     grid on;
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\05_theta_peak_pvt' filesep sub '_poststim.png']);
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\05_theta_peak_pvt' filesep sub '_poststim.png']);
     close;
 
     % speichern

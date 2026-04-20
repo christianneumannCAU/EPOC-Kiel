@@ -3,15 +3,15 @@ clc; clear all; close all;
 
 %% Step 0: add + prepare everything
 
-MAIN                = 'C:\Users\chris\Desktop\EPOC\';                       % paste path to EPOC folder
+MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';                       % paste path to EPOC folder
 cd(MAIN);                                                                   % go into EPOC folder
 
 epocPath            = genpath(MAIN);
-fieldtripPath       = genpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');
+fieldtripPath       = genpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');
 epocPath            = strrep(epocPath, fieldtripPath, '');                  % add fieldtrip seperately from the rest 
 
 addpath(epocPath);                                                          % add EPOC 
-addpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');      % and fieldtrip 
+addpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');      % and fieldtrip 
 
 % Set envir
 PATHIN              = [MAIN '01_data\00_bids\'];                            % Path to BIDS data
@@ -34,7 +34,7 @@ patient             = patient(isVP);
 all_IC_tables       = [];
 
 % rmove path to EEG lab
-rmpath(genpath('C:\Users\chris\Desktop\EPOC\04_software\eeglab_current\eeglab2024.2')); 
+rmpath(genpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\eeglab_current\eeglab2024.2')); 
 rehash;
 % initiate fieldtrip
 ft_defaults;
@@ -56,7 +56,7 @@ for p               = 1 : numel(patient)
     end
 
     % check, if data for this VP already exists
-    exists          = dir('C:\Users\chris\Desktop\EPOC\01_data\01_individual_data_after_ICA_pvt');
+    exists          = dir('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\01_individual_data_after_ICA_pvt');
     ex              = cellfun(@(x) extractBefore(x, '.'), {exists.name}, 'UniformOutput', false);
     if ismember(extractBefore(indat.name, 11), ex) 
         continue;
@@ -156,7 +156,7 @@ for p               = 1 : numel(patient)
     title('Z-Score per Trial');
     yline(2, 'r--', 'Threshold +2');
     yline(-2, 'r--', 'Threshold -2')
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\01_bad_trials_z_pvt' filesep patient(p).name '_trials_z.png']); 
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\01_bad_trials_z_pvt' filesep patient(p).name '_trials_z.png']); 
     close;
 
     % save how many segments were removed per participant
@@ -165,7 +165,7 @@ for p               = 1 : numel(patient)
     %% Step 6: automatic ICA
     
     % add path to EEGLAB
-    addpath(genpath('C:\Users\chris\Desktop\EPOC\04_software\eeglab_current\eeglab2024.2'));
+    addpath(genpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\eeglab_current\eeglab2024.2'));
     eeglab; close;                                                          
     
     EEG                     = fieldtrip2eeglab(data_tica, data_tica.trial); % change fieldtrip data to eeglab data
@@ -260,7 +260,7 @@ for p               = 1 : numel(patient)
     % good components
     cfg.comment         = 'no'
     ft_topoplotIC(cfg, comp);
-    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\03_figures\02_ica_plots_pvt' filesep patient(p).name '_goodcomps.png']); 
+    saveas(gcf, ['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\02_ica_plots_pvt' filesep patient(p).name '_goodcomps.png']); 
     close;
 
     % bad components

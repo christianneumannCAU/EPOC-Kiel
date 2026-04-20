@@ -1,16 +1,16 @@
 clc; clear all; close all;
 %% prepare
-addpath('C:\Users\chris\Desktop\EPOC\04_software\fieldtrip-20250106');
+addpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');
 
-load("C:\Users\chris\Desktop\EPOC\01_data\topoplot_workspace.mat"); 
+load("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace.mat"); 
 
 % path to folder with ICA weights
-path = "C:\Users\chris\Desktop\EPOC\01_data\01_individual_data_after_ICA";
+path = "C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\01_individual_data_after_ICA";
 % list of all .mat files
 data = dir(fullfile(path, '*.mat'));
 
 %% build groups
-T_merged        = readtable("C:\Users\chris\Desktop\EPOC\01_data\00_bids\participants.tsv", 'Delimiter', '\t', 'FileType','text');
+T_merged        = readtable("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\00_bids\participants.tsv", 'Delimiter', '\t', 'FileType','text');
 
 
 used_ids        = cellfun(@(x) x(1:end-4), {data.name}, 'UniformOutput', false);
@@ -46,7 +46,7 @@ zlimBoth = get_common_zlim_both(GA_with, GA_without, freqband, timewin, roi);
 
 %% ===== Plot Figure =====
 figure('Color','w');
-set(gcf,'Units','pixels','Position',[100 100 1600 1400]);
+set(gcf,'Units','pixels','Position',[100 100 2500 2000]);
 set(gcf,'PaperPositionMode','auto');
 
 tlo = tiledlayout(2,1,'TileSpacing','compact','Padding','compact');
@@ -69,7 +69,14 @@ plot_single_TFR_subplot(GA_without, ...
 title('No Self-Reported Cognitive Symptoms', ...
     'FontSize', 40, 'FontWeight','bold', 'Color', wine);
 
-saveas(gcf, 'C:\Users\chris\Desktop\EPOC\03_figures\07_eeg_peaks\TFR.png');
+annotation('textbox', [0.05 0.965 0.6 0.03], ...
+    'String', 'Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post−COVID−19', ...
+    'HorizontalAlignment', 'left', ...
+    'EdgeColor', 'none', ...
+    'FontSize', 11, ...
+    'FontWeight', 'normal')
+
+exportgraphics(gcf, 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\TFR.png', 'Resolution', 500);
 
 %% ===== functions =====
 

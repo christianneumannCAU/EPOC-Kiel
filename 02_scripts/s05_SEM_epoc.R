@@ -1,8 +1,13 @@
+library(readr)
 library(lavaan)
 
-merged_clean <- read.csv("~/GitHub/EPOC/02_data/01_prep/behavioral/behavioral_clean.csv")
+merged_clean <- readr::read_tsv("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/01_data/00_bids/participants.tsv")
 
 merged_scaled <- merged_clean
+merged_scaled$facit_f_FS <- as.numeric(merged_scaled$facit_f_FS)
+merged_scaled$moca <- as.numeric(merged_scaled$moca)
+merged_scaled$nback_miss_1 <- as.numeric(merged_scaled$nback_miss_1)
+merged_scaled$pvt_reaction_time <- as.numeric(merged_scaled$pvt_reaction_time)
 merged_scaled[, c("moca", "tmt_a_time", "tmt_b_time", "pvt_reaction_time", "nback_miss_1", "facit_f_FS", "age", "years_of_education")] <- 
   scale(merged_scaled[, c("moca", "tmt_a_time", "tmt_b_time", "pvt_reaction_time", "nback_miss_1", "facit_f_FS", "age", "years_of_education")])
 

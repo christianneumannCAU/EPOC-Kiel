@@ -7,7 +7,7 @@ library(psych)
 library(tidyr)
 library(ggtext)
 
-merged_clean <- readr::read_tsv("C:/Users/chris/Desktop/EPOC/01_data/00_bids/participants.tsv")
+merged_clean <- readr::read_tsv("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/01_data/00_bids/participants.tsv")
 
 eeg_vars  <- c("theta_peak_power_Pre","alpha_peak_power_Pre",
                "theta_peak_power_Post","alpha_peak_power_Post")
@@ -125,7 +125,7 @@ ggplot(dat, aes(Test, EEG, fill = rho)) +
   labs(x = NULL, y = NULL)
 
 
-ggsave("C:/Users/chris/Desktop/EPOC/03_figures/06_heatmaps/eeg.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/03_figures/06_heatmaps/eeg.png", width = 7, height = 5, units = "in", dpi = 500)
 
 ################## scatterplots for significant correlations ###################
 
@@ -172,9 +172,14 @@ p3 <- ggplot(merged_clean, aes(nback_miss_1, theta_peak_power_Post)) +
   )
 
 
-p1+p2+p3
+final_plot <- (p1+p2+p3) +
+  plot_annotation(
+    title = "Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post-COVID-19",
+    theme = theme(plot.title = element_text(hjust = 0.5, size = 9))
+  )
+final_plot
 
-ggsave("C:/Users/chris/Desktop/EPOC/03_figures/07_eeg_peaks/Scatter_eeg.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/03_figures/07_eeg_peaks/Scatter_eeg.pdf", width = 7, height = 5, units = "in", dpi = 500)
 
 ####################################################################
 
@@ -296,6 +301,12 @@ p_alpha <- ggplot(alpha_summary, aes(x = Time, y = mean, group = group,
 
 combined_plot <- (p_alpha + p_theta) + plot_layout(guides = "collect") &
   theme(legend.position = "top")
+
+combined_plot <- combined_plot +
+  plot_annotation(
+    title = "Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post-COVID-19",
+    theme = theme(plot.title = element_text(hjust = 0.5, size = 9))
+  )
 combined_plot
 
-ggsave("C:/Users/chris/Desktop/EPOC/03_figures/07_eeg_peaks/pre_post_alpha_theta.png", width = 7.5, height = 5, units = "in", dpi = 300)
+ggsave("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/03_figures/07_eeg_peaks/pre_post_alpha_theta.pdf", width = 7.5, height = 5, units = "in", dpi = 500)

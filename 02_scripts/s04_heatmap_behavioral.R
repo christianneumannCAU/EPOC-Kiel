@@ -2,7 +2,7 @@ library(readr)
 library(ggplot2)
 
 # read participants 
-merged_clean <- readr::read_tsv("C:/Users/chris/Desktop/EPOC/01_data/00_bids/participants.tsv")
+merged_clean <- readr::read_tsv("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/01_data/00_bids/participants.tsv")
 
 # number of NA per column
 colSums(is.na(merged_clean))
@@ -90,4 +90,4 @@ ggplot(dat2, aes(Var2, Var1, fill = rho)) +
         panel.grid = element_blank()) +
   labs(x = NULL, y = NULL)
 
-ggsave("C:/Users/chris/Desktop/EPOC/03_figures/06_heatmaps/behavioral.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/03_figures/06_heatmaps/behavioral.png", width = 7, height = 5, units = "in", dpi = 300)
