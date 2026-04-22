@@ -390,9 +390,8 @@ ylabel(h,'Power (µV²)','FontSize',14)
 set(h,'FontSize',12)
 
 set(gcf,'Units','pixels','Position',[100 100 2500 1800])
-exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_theta.png','Resolution',500)
+exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_theta.tif','Resolution',500)
 
-saveas(gcf,['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks' filesep 'topo_theta.png']);
 
 
 
@@ -474,6 +473,5 @@ ylabel(h,'Power (µV²)','FontSize',14)
 set(h,'FontSize',12)
 
 set(gcf,'Units','pixels','Position',[100 100 2500 1800])
-exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_alpha.png','Resolution',500)
+exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_alpha.tif','Resolution',500)
 
-saveas(gcf,['C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks' filesep 'topo_alpha.png']);

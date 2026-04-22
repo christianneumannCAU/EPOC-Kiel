@@ -76,7 +76,7 @@ annotation('textbox', [0.05 0.965 0.6 0.03], ...
     'FontSize', 11, ...
     'FontWeight', 'normal')
 
-exportgraphics(gcf, 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\TFR.png', 'Resolution', 500);
+exportgraphics(gcf, 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\TFR.tif', 'Resolution', 500);
 
 %% ===== functions =====
 
