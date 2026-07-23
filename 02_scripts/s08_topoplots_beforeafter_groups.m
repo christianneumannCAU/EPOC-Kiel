@@ -8,7 +8,7 @@ path                = "C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\01_individu
 % list of all .mat files
 data = dir(fullfile(path, '*.mat'));
 
-MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';                       % paste path to EPOC folder
+MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';             % paste path to EPOC folder
 cd(MAIN);                                                                   % go into EPOC folder
 
 epocPath            = genpath(MAIN);
@@ -285,10 +285,10 @@ freq_post([49,60,70]) = [];
 used_ids([49,60,70])  = [];
 
 [~,idx] = ismember(used_ids,T_merged.participant_id);
-group_labels = T_merged.group(idx);
+group_labels = T_merged.group_Fatigue(idx);
 
-idx_with    = strcmp(group_labels,'withPCS');
-idx_without = strcmp(group_labels,'withoutPCS');
+idx_with    = strcmp(group_labels,'clinically relevant fatigue');
+idx_without = strcmp(group_labels,'no clinically relevant fatigue');
 
 freq_pre_with    = freq_pre(idx_with);
 freq_pre_without = freq_pre(idx_without);
@@ -313,87 +313,83 @@ load('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\BC-128-pass-lay.mat');
 cfg.elec   = elec;
 cfg.layout = ft_prepare_layout(cfg);
 cfg.marker = 'on';
+cfg.markersymbol = '.';
+cfg.markersize = 3;
 cfg.comment = 'no';
-cfg.zlim = [-0.08 0.08];
+cfg.zlim = [-0.06 0.06];
 cfg.xlim = [4 7];
+
+set(groot,'defaultAxesFontName','Arial')
+set(groot,'defaultTextFontName','Arial')
 
 figure('Color','w','Position',[100 100 800 600]);
 cfg.figure = gcf;
+cfg.colormap = ft_colormap('balance',256);
 
-subplot(2,2,1)
-cfg.colormap = flipud(ft_colormap('RdBu'));
-
+ax(1) = subplot(2,2,1);
 ft_topoplotER(cfg, GA_pre_with)
 title({['\color[rgb]{' num2str(col_pre) '}Pre-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_self) '}Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_self) '}Fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
 
-subplot(2,2,2)
+ax(2) = subplot(2,2,2);
 ft_topoplotER(cfg, GA_pre_without)
 title({['\color[rgb]{' num2str(col_pre) '}Pre-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_no) '}No Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_no) '}No Fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
 
-subplot(2,2,3)
+ax(3) = subplot(2,2,3);
 ft_topoplotER(cfg, GA_post_with)
 title({['\color[rgb]{' num2str(col_post) '}Post-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_self) '}Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_self) '}Fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
 
-subplot(2,2,4)
+ax(4) = subplot(2,2,4);
 ft_topoplotER(cfg, GA_post_without)
 title({['\color[rgb]{' num2str(col_post) '}Post-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_no) '}No Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_no) '}No Fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
+% Adjust subplot positions
+ax(1).Position = [0.08 0.56 0.28 0.30];
+ax(2).Position = [0.34 0.56 0.28 0.30];
+ax(3).Position = [0.08 0.16 0.28 0.30];
+ax(4).Position = [0.34 0.16 0.28 0.30];
 
-ax = findall(gcf,'Type','axes','-not','Tag','Colorbar');
+% Add panel labels
+letters = {'A','B','C','D'};
 
-for i = 1:length(ax)
-    pos = get(ax(i),'Position');
-    pos(1) = pos(1) - 0.1;
-    set(ax(i),'Position',pos);
+for k = 1:4
+    axes(ax(k))
+    text(-0.05,1.05,letters{k},...
+        'Units','normalized',...
+        'FontName','Arial',...
+        'FontWeight','bold',...
+        'FontSize',16,...
+        'HorizontalAlignment','left');
 end
 
-allPos = cell2mat(get(ax,'Position'));
+% Add colorbar
+h = colorbar('Position',[0.70 0.16 0.018 0.74]);
 
-left   = min(allPos(:,1));
-bottom = min(allPos(:,2));
-right  = max(allPos(:,1)+allPos(:,3));
-top    = max(allPos(:,2)+allPos(:,4));
+ylabel(h,'Power (\muV^2)',...
+    'FontName','Arial',...
+    'FontSize',16,...
+    'FontWeight','bold');
 
-margin_axes  = 0.03;
-margin_title = 0.30;
+set(h,...
+    'FontName','Arial',...
+    'FontSize',14);
 
-leftFrame   = max(left  - margin_axes , 0.02);
-bottomFrame = max(bottom - margin_axes, 0.02);
-rightFrame  = min(right + margin_axes , 0.86);
-topFrame    = min(top   + margin_title,0.9999);
-
-rectPos = [ leftFrame , bottomFrame , ...
-            rightFrame-leftFrame , topFrame-bottomFrame ];
-
-annotation('rectangle', rectPos, 'Color', col_theta_circle, 'LineWidth', 4)
-
-annotation('textbox', [0.12 0.965 0.6 0.03], ...
-    'String', 'Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post−COVID−19', ...
-    'HorizontalAlignment', 'center', ...
-    'EdgeColor', 'none', ...
-    'FontSize', 11, ...
-    'FontWeight', 'normal')
-
-h = colorbar('Position',[0.88 0.15 0.02 0.7]);
-ylabel(h,'Power (µV²)','FontSize',14)
-set(h,'FontSize',12)
-
+% Export
 set(gcf,'Units','pixels','Position',[100 100 2500 1800])
-exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_theta.tif','Resolution',500)
 
-
-
+exportgraphics(gcf,...
+'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\topo_theta.pdf',...
+'Resolution',600)
 
 %% ------------------------------------------------------------
 %  ALPHA
@@ -404,74 +400,75 @@ load('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\BC-128-pass-lay.mat');
 cfg.elec   = elec;
 cfg.layout = ft_prepare_layout(cfg);
 cfg.marker = 'on';
+cfg.markersymbol = '.';
+cfg.markersize = 3;
 cfg.comment = 'no';
-cfg.zlim = [-0.08 0.08];
+cfg.zlim = [-0.06 0.06];
 cfg.xlim = [8 12];
+
+set(groot,'defaultAxesFontName','Arial')
+set(groot,'defaultTextFontName','Arial')
 
 figure('Color','w','Position',[100 100 800 600]);
 cfg.figure = gcf;
-cfg.colormap = flipud(ft_colormap('RdBu'));
+cfg.colormap = ft_colormap('balance',256);
 
-subplot(2,2,1)
+ax(1) = subplot(2,2,1)
 ft_topoplotER(cfg, GA_pre_with)
 title({['\color[rgb]{' num2str(col_pre) '}Pre-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_self) '}Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_self) '}Fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
-subplot(2,2,2)
+ax(2) = subplot(2,2,2)
 ft_topoplotER(cfg, GA_pre_without)
 title({['\color[rgb]{' num2str(col_pre) '}Pre-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_no) '}No Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_no) '}No fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
-subplot(2,2,3)
+ax(3) = subplot(2,2,3)
 ft_topoplotER(cfg, GA_post_with)
 title({['\color[rgb]{' num2str(col_post) '}Post-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_self) '}Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_self) '}Fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
-subplot(2,2,4)
+ax(4) = subplot(2,2,4)
 ft_topoplotER(cfg, GA_post_without)
 title({['\color[rgb]{' num2str(col_post) '}Post-Stimulus'], ...
-       ['\color[rgb]{' num2str(col_no) '}No Self-Reported Cognitive Symptoms']}, ...
-       'FontSize', 13, 'FontWeight', 'bold', 'Interpreter', 'tex')
+       ['\color[rgb]{' num2str(col_no) '}No fatigue']}, ...
+       'FontSize', 15, 'FontWeight', 'bold', 'Interpreter', 'tex')
 
-ax = findall(gcf,'Type','axes','-not','Tag','Colorbar');
+ax(1).Position = [0.08 0.56 0.28 0.30];
+ax(2).Position = [0.34 0.56 0.28 0.30];
+ax(3).Position = [0.08 0.16 0.28 0.30];
+ax(4).Position = [0.34 0.16 0.28 0.30];
 
-for i = 1:length(ax)
-    pos = get(ax(i),'Position');
-    pos(1) = pos(1) - 0.1;
-    set(ax(i),'Position',pos);
+letters = {'A','B','C','D'};
+
+for k = 1:4
+    axes(ax(k))
+    text(-0.05,1.05,letters{k},...
+        'Units','normalized',...
+        'FontName','Arial',...
+        'FontWeight','bold',...
+        'FontSize',16,...
+        'HorizontalAlignment','left');
 end
 
-allPos = cell2mat(get(ax,'Position'));
+% Add colorbar
+h = colorbar('Position',[0.70 0.16 0.018 0.74]);
 
-left   = min(allPos(:,1));
-bottom = min(allPos(:,2));
-right  = max(allPos(:,1)+allPos(:,3));
-top    = max(allPos(:,2)+allPos(:,4));
+ylabel(h,'Power (\muV^2)',...
+    'FontName','Arial',...
+    'FontSize',16,...
+    'FontWeight','bold');
 
-leftFrame   = max(left  - margin_axes , 0.02);
-bottomFrame = max(bottom - margin_axes, 0.02);
-rightFrame  = min(right + margin_axes , 0.86);
-topFrame    = min(top   + margin_title,0.9999);
+set(h,...
+    'FontName','Arial',...
+    'FontSize',14);
 
-rectPos = [ leftFrame , bottomFrame , ...
-            rightFrame-leftFrame , topFrame-bottomFrame ];
-
-annotation('rectangle', rectPos, 'Color', col_alpha_circle, 'LineWidth', 4)
-
-annotation('textbox', [0.12 0.965 0.6 0.03], ...
-    'String', 'Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post−COVID−19', ...
-    'HorizontalAlignment', 'center', ...
-    'EdgeColor', 'none', ...
-    'FontSize', 11, ...
-    'FontWeight', 'normal')
-
-h = colorbar('Position',[0.88 0.15 0.02 0.7]);
-ylabel(h,'Power (µV²)','FontSize',14)
-set(h,'FontSize',12)
-
+% Export
 set(gcf,'Units','pixels','Position',[100 100 2500 1800])
-exportgraphics(gcf,'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\topo_alpha.tif','Resolution',500)
 
+exportgraphics(gcf,...
+'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\topo_alpha.pdf',...
+'Resolution',600)

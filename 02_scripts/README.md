@@ -24,36 +24,37 @@
 
 
 
-* **s03\_participants\_demographics:** Jasp-file to calculate descriptive information, contingency tables with chi-squared Tests and Mann-Whitney U tests for group differences 
+* **s03\_participants\_demographics:** Jasp-file to calculate descriptive information, contingency tables with chi-squared tests and Mann-Whitney U tests for group differences
 
 
 
-* **s04\_heatmap\_behavioral:** R-Script to calculate heatmap for questionnaire scores, cognitive test scores, age, and education and save it in EPOC\\03\_figures\\06\_heatmaps
+* **s04\_partial\_correlations\_epoc:** Jasp-file to calculate partial correlation analyses for each questionnaire score while controlling for the respective other questionnaires, age, and education and save it in EPOC\\03\_figures\\06\_heatmaps
 
 
 
-* **s05\_SEM\_epoc:** R-Script to calculate structural equation model with EPOC data
+* **s05\_partial\_correlations\_covidom:** Jasp-file calculating the same analyses from s05, but for the covidom dataset
 
 
 
-* **s06\_PVT\_group:** Jasp-file to calculate Mann-Whitney U test for group differences in PVT reaction time
+* **s06\_pre\_post\_increase\_eeg:** R-script to look for outliers in the EEG data and calculate graphics for pre-post changes in alpha and theta Peak power (graphic saved in EPOC\\03\_figures\\06\_eeg\_peaks)
+
+&#x20;
+
+* **s07\_EEG\_correlations:** Jasp-file to calculate Wilcoxon signed-rank tests for differences pre- vs post-stimulus, and Mann-Whitney U tests for group differences in the increase of EEG peak power between particpants with clinically significant fatigue and participants without clinically significant fatigue, for alpha and Theta
+* 
+* **s08\_topoplots\_beforeafter\_groups**: Calculating Time-Frequency Analysis on data and creating topographical plots for Alpha and Theta seperated by Group and pre- vs post-stimulus (in EPOC\\03\_figures\\06\_eeg\_peaks) + saving data in EPOC\\02\_data\\01\_prep\\aperiodic\_pvt\\topoplot\_workspace
 
 
 
-* **s07\_SEM\_covidom:** R-Script to calculate structural equation model with COVIDOM data
+* **s09\_TFR\_plots**: creating TFR plots based on data from s08\_topoplots\_beforeafter\_groups in EPOC\\03\_figures\\06\_eeg\_peaks
 
 
 
-* **s08\_heatmap\_scatterplots\_eeg:** R-Script to calculate heatmap for questionnaire scores, cognitive test scores, and EEG peak power (in EPOC\\03\_figures\\06\_heatmaps), scatterplots for the significant correlations (in EPOC\\03\_figures\\07\_eeg\_peaks), and graphics for pre-post changes in alpha and theta Peak power
+* **s10\_subjective\_cognitive\_symptoms:** Jasp-file to calculate Mann-Whitney U tests for group differences in PVT reaction time between participants reporting cognitive symptoms and participants without such symptoms
 
 
 
-* **s09\_participants\_eeg\_peaks:** Jasp-file to calculate Wilcoxon signed-rank tests for differences pre- vs post-stimulus, and Mann-Whitney U tests for group differences in EEG peak power, for alpha and theta 
+* **s11\_mediation\_epoc:** R-script to calculate a regression-based mediation analysis, testing the indirect effect of fatigue in the association between subjective cognitive symptoms and PVT reaction time, and the remaining direct effect
+* 
+* **s12\_holm\_corrections:** R-script to calculate holm-corrected p-values 
 
-
-
-* **s10\_topoplots\_beforeafter\_groups**: Calculating Time-Frequency Analysis on data and creating topographical plots for Alpha and Theta seperated by Group and pre- vs post-stimulus (in EPOC\\03\_figures\\07\_eeg\_peaks) + saving data in EPOC\\02\_data\\01\_prep\\aperiodic\_pvt\\topoplot\_workspace
-
-
-
-* **s11\_TFR\_plots**: creating TFR plots based on data from s10\_topoplots\_beforeafter\_groups in EPOC\\03\_figures\\07\_eeg\_peaks

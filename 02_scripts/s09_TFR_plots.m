@@ -24,10 +24,10 @@ used_ids([49])  = [];
 
 % Mapping for T_merged
 [~, idx]        = ismember(used_ids, T_merged.participant_id);
-group_labels    = T_merged.group(idx);
+group_labels    = T_merged.group_Fatigue(idx);
 
-idx_with        = strcmp(group_labels, 'withPCS');
-idx_without     = strcmp(group_labels, 'withoutPCS');
+idx_with        = strcmp(group_labels, 'clinically relevant fatigue');
+idx_without     = strcmp(group_labels, 'no clinically relevant fatigue');
 
 TFR_with        = TFR(idx_with);
 TFR_without     = TFR(idx_without);
@@ -45,38 +45,122 @@ roi             = 'all';
 zlimBoth = get_common_zlim_both(GA_with, GA_without, freqband, timewin, roi);
 
 %% ===== Plot Figure =====
+
+set(groot,'defaultAxesFontName','Arial')
+set(groot,'defaultTextFontName','Arial')
+
 figure('Color','w');
-set(gcf,'Units','pixels','Position',[100 100 2500 2000]);
+set(gcf,'Units','pixels','Position',[100 100 1800 1400]);
 set(gcf,'PaperPositionMode','auto');
 
-tlo = tiledlayout(2,1,'TileSpacing','compact','Padding','compact');
+tlo = tiledlayout(2,1,...
+    'TileSpacing','compact',...
+    'Padding','compact');
 
-% colors
-pink = [204 121 167] / 255;   % #CC79A7
-wine = [130 50 94]   / 255;   % #82325E
 
-% --- group WITH ---
-nexttile;
+% Colors
+pink = [204 121 167] / 255;   
+wine = [130 50 94] / 255;     
+
+
+%% --- Group WITH ---
+
+ax(1) = nexttile;
+
 plot_single_TFR_subplot(GA_with, ...
-    'Self-Reported Cognitive Symptoms', freqband, timewin, roi, zlimBoth);
-title('Self-Reported Cognitive Symptoms', ...
-    'FontSize', 40, 'FontWeight','bold', 'Color', pink);
+    'Clinically significant fatigue', ...
+    freqband, timewin, roi, zlimBoth);
 
-% --- group WITHOUT ---
-nexttile;
+title('Fatigue',...
+    'FontName','Arial',...
+    'FontSize',15,...
+    'FontWeight','bold',...
+    'Color',pink);
+
+
+%% --- Group WITHOUT ---
+
+ax(2) = nexttile;
+
 plot_single_TFR_subplot(GA_without, ...
-    'No Self-Reported Cognitive Symptoms', freqband, timewin, roi, zlimBoth);
-title('No Self-Reported Cognitive Symptoms', ...
-    'FontSize', 40, 'FontWeight','bold', 'Color', wine);
+    'No clinically significant fatigue', ...
+    freqband, timewin, roi, zlimBoth);
 
-annotation('textbox', [0.05 0.965 0.6 0.03], ...
-    'String', 'Neumann - Neurophysiological Correlates of Cognitive Symptoms in Post−COVID−19', ...
-    'HorizontalAlignment', 'left', ...
-    'EdgeColor', 'none', ...
-    'FontSize', 11, ...
-    'FontWeight', 'normal')
+title('No Fatigue',...
+    'FontName','Arial',...
+    'FontSize',15,...
+    'FontWeight','bold',...
+    'Color',wine);
 
-exportgraphics(gcf, 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\07_eeg_peaks\TFR.tif', 'Resolution', 500);
+
+
+%% ===== Formatting =====
+
+for k = 1:2
+    
+    ax(k).FontName = 'Arial';
+    ax(k).FontSize = 10;
+    
+    ax(k).XAxis.FontSize = 10;
+    ax(k).YAxis.FontSize = 10;
+    
+    ax(k).XLabel.FontSize = 11;
+    ax(k).YLabel.FontSize = 11;
+    
+    ax(k).LineWidth = 1;
+    
+end
+
+
+
+%% ===== Panel labels =====
+
+letters = {'A','B'};
+
+for k = 1:2
+    
+    annotation('textbox',...
+        [ax(k).Position(1)-0.015,...
+         ax(k).Position(2)+ax(k).Position(4)-0.005,...
+         0.03,...
+         0.03],...
+        'String',letters{k},...
+        'LineStyle','none',...
+        'FontName','Arial',...
+        'FontSize',15,...
+        'FontWeight','bold',...
+        'Margin',0);
+    
+end
+
+
+
+%% ===== Colorbar formatting =====
+
+cb = findall(gcf,'Type','ColorBar');
+
+for k = 1:length(cb)
+
+    cb(k).FontName = 'Arial';
+    cb(k).FontSize = 10;
+
+    cb(k).Label.FontName = 'Arial';
+    cb(k).Label.FontSize = 11;
+
+end
+
+
+
+%% ===== Export =====
+
+set(gcf, 'Units', 'centimeters', 'Position', [5 5 18 22])
+
+exportgraphics(gcf,...
+'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\TFR.png',...
+'Resolution',600);
+
+
+
 
 %% ===== functions =====
 
