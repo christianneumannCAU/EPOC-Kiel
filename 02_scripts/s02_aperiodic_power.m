@@ -294,7 +294,7 @@ for i               = 1:length(data)
     theta_peak_power        = corr_power(original.freq == theta_peak);
     mean_theta_power        = mean(corr_power(mask_theta));
 
-    % show alpha
+    % show theta
     figure; hold on;
     plot(original.freq, corr_power, 'b');
     plot(theta_peak, corr_power(original.freq==theta_peak), 'ro', 'MarkerSize',8,'LineWidth',2);
