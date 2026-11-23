@@ -91,7 +91,75 @@ for i               = 1:length(data)
         continue; 
     end
 
-    data_t                  = ft_redefinetrial(cfg, data_p);
+    %% Remove practice trials and invalid reaction times
+
+    % Get trial start and button press markers
+    values = string({events.value});
+
+    start_samples = [events(values == "Trial start").sample]';
+    bp_samples    = [events(values == "BP").sample]';
+
+    % Match EEG trials to their original stimulus markers
+    trl_onsets = cfg.trl{:,1} - cfg.trl{:,3};
+    nTrials = size(cfg.trl, 1);
+
+    marker_idx = zeros(nTrials, 1);
+
+    for t = 1:nTrials
+        matches = find(abs(start_samples - trl_onsets(t)) <= 1);
+
+        assert(numel(matches) == 1, ...
+            'No unique marker match for trial %d in %s', t, sub);
+
+        marker_idx(t) = matches;
+    end
+
+    % Check that each marker is used only once
+    assert(numel(unique(marker_idx)) == nTrials, ...
+        'Duplicate marker assignment for %s', sub);
+
+    % Calculate reaction times
+    rt = NaN(nTrials, 1);
+
+    for t = 1:nTrials
+
+        m = marker_idx(t);
+
+        % Find next stimulus marker
+        if m < numel(start_samples)
+            next_start = start_samples(m+1);
+        else
+            next_start = Inf;
+        end
+
+        % Find first button press after stimulus
+        bp = bp_samples(bp_samples > start_samples(m) & ...
+                        bp_samples < next_start);
+
+        if ~isempty(bp)
+            rt(t) = (bp(1) - start_samples(m)) / data_p.fsample;
+        end
+    end
+
+    % Identify valid trials using ORIGINAL trial numbers
+    valid_trials = marker_idx > 8 & ...
+                   rt >= 0.1 & rt <= 1.0;
+
+    % Display trial counts
+    fprintf('%s:\n', sub);
+    fprintf('  Stimulus markers: %d\n', numel(start_samples));
+    fprintf('  EEG trials before exclusion: %d\n', nTrials);
+    fprintf('  Practice trials excluded: %d\n', sum(marker_idx <= 8));
+    fprintf('  RT < 100 ms: %d\n', sum(rt(marker_idx > 8) < 0.1));
+    fprintf('  RT > 1000 ms: %d\n', sum(rt(marker_idx > 8) > 1.0));
+    fprintf('  Missing button presses: %d\n', sum(isnan(rt(marker_idx > 8))));
+    fprintf('  Remaining trials: %d\n', sum(valid_trials));
+
+    % Remove excluded trials
+    cfg.trl = cfg.trl(valid_trials, :);
+
+    % Segment remaining trials
+    data_t = ft_redefinetrial(cfg, data_p);
 
     %% delete bad components
     
@@ -193,7 +261,7 @@ for i               = 1:length(data)
     cfg                         = [];
     cfg.fooof.aperiodic_mode    = 'knee';
     cfg.foilim                  = [1 40]; 
-    cfg.tapsmofrq               = 4; 
+    cfg.tapsmofrq               = 2; 
     cfg.pad                     = 4;
     cfg.method                  = 'mtmfft';
     cfg.output                  = 'fooof_aperiodic';
@@ -213,12 +281,13 @@ for i               = 1:length(data)
     cfg                         = [];
     cfg.output                  = 'pow';                                    % only powerspectrum
     cfg.method                  = 'mtmfft';
-    cfg.tapsmofrq               = 4;
+    cfg.tapsmofrq               = 2;
     cfg.pad                     = 4;
-    cfg.foilim                  = [1 40]; 
+    cfg.foilim                  = [1 40];
+    cfg.keeptrials              = 'yes';
     freq_single                 = ft_freqanalysis(cfg, data_pre);  
     % average over channels for trial
-    pow                         = squeeze(mean(freq_single.powspctrm, 3));  % [nTrials x nFreqs]
+    pow                         = squeeze(mean(freq_single.powspctrm, 2));  % [nTrials x nFreqs]
     mean_pow                    = mean(pow, 1);                             % [1 x nFreqs]
     
     %% display the spectra 
@@ -330,7 +399,7 @@ for i               = 1:length(data)
     cfg                         = [];
     cfg.fooof.aperiodic_mode    = 'knee';
     cfg.foilim                  = [1 40]; 
-    cfg.tapsmofrq               = 4; 
+    cfg.tapsmofrq               = 2; 
     cfg.pad                     = 4;
     cfg.method                  = 'mtmfft';
     cfg.output                  = 'fooof_aperiodic';
@@ -350,12 +419,13 @@ for i               = 1:length(data)
     cfg                         = [];
     cfg.output                  = 'pow';                                    % only powerspectrum
     cfg.method                  = 'mtmfft';
-    cfg.tapsmofrq               = 4;
+    cfg.tapsmofrq               = 2;
     cfg.pad                     = 4;
-    cfg.foilim                  = [1 40]; 
+    cfg.foilim                  = [1 40];
+    cfg.keeptrials              = 'yes';
     freq_single                 = ft_freqanalysis(cfg, data_post);  
     % average over channels for trial
-    pow                         = squeeze(mean(freq_single.powspctrm, 3));  % [nTrials x nFreqs]
+    pow                         = squeeze(mean(freq_single.powspctrm, 2));  % [nTrials x nFreqs]
     mean_pow                    = mean(pow, 1);                             % [1 x nFreqs]
 
     %% display the spectra 
