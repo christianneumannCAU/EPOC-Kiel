@@ -8,7 +8,7 @@ path                = "C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\01_individu
 % list of all .mat files
 data = dir(fullfile(path, '*.mat'));
 
-MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';             % paste path to EPOC folder
+MAIN                = 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\';                       % paste path to EPOC folder
 cd(MAIN);                                                                   % go into EPOC folder
 
 epocPath            = genpath(MAIN);
@@ -21,6 +21,7 @@ addpath('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\04_software\fieldtrip-20250106');
 PATHIN      = [MAIN '01_data\00_bids\'];
 PATHOUT     = [MAIN '01_data\'];
 
+
 % prepare patients 
 patient             = dir(PATHIN);
 patient([1,2],:)    = [];
@@ -28,17 +29,22 @@ patient([1,2],:)    = [];
 isVP                = startsWith({patient.name}, "sub");
 patient             = patient(isVP);
 
-% prepare layout
-cfg = [];
+% Load the electrode layout needed for channel repair
 load('BC-128-pass-lay.mat');
-cfg.elec            = elec;
-layout              = ft_prepare_layout(cfg);
 
-corr_power_pre = cell(1,95);
-corr_power_post = cell(1,95);
+% Prepare channel-wise spectra for topographical plots
+freq_pre  = cell(numel(data), 1);
+freq_post = cell(numel(data), 1);
 
-freq_pre = cell(95, 1);
-freq_post = cell(95, 1);
+% Use the participant cohort from the revised main EEG analysis
+main_results = load([PATHOUT '02_fooof_pvt' filesep 'fooofed.mat'], ...
+    'results_pre', 'results_post');
+main_ids = string({main_results.results_pre.id});
+main_ids = main_ids(strlength(main_ids) > 0);
+post_ids = string({main_results.results_post.id});
+post_ids = post_ids(strlength(post_ids) > 0);
+assert(isequal(sort(main_ids), sort(post_ids)), ...
+    'Pre/Post participant IDs in fooofed.mat do not match.');
 
 %% Loop over every participant
 
@@ -48,6 +54,11 @@ for i               = 1:length(data)
     datapath        = fullfile(path, data(i).name);
     load(datapath);
     sub             = data(i).name(1:end-4);
+
+    % Keep only participants from the revised main EEG analysis
+    if ~ismember(string(sub), main_ids)
+        continue;
+    end
 
     %% delete bad channels
     idx             = find(strcmp({patient.name}, sub));                    % find the Index in patient
@@ -96,7 +107,75 @@ for i               = 1:length(data)
         continue; 
     end
 
-    data_t                  = ft_redefinetrial(cfg, data_p);
+    %% Remove practice trials and invalid reaction times
+
+    % Get trial start and button press markers
+    values = string({events.value});
+
+    start_samples = [events(values == "Trial start").sample]';
+    bp_samples    = [events(values == "BP").sample]';
+
+    % Match EEG trials to their original stimulus markers
+    trl_onsets = cfg.trl{:,1} - cfg.trl{:,3};
+    nTrials = size(cfg.trl, 1);
+
+    marker_idx = zeros(nTrials, 1);
+
+    for t = 1:nTrials
+        matches = find(abs(start_samples - trl_onsets(t)) <= 1);
+
+        assert(numel(matches) == 1, ...
+            'No unique marker match for trial %d in %s', t, sub);
+
+        marker_idx(t) = matches;
+    end
+
+    % Check that each marker is used only once
+    assert(numel(unique(marker_idx)) == nTrials, ...
+        'Duplicate marker assignment for %s', sub);
+
+    % Calculate reaction times
+    rt = NaN(nTrials, 1);
+
+    for t = 1:nTrials
+
+        m = marker_idx(t);
+
+        % Find next stimulus marker
+        if m < numel(start_samples)
+            next_start = start_samples(m+1);
+        else
+            next_start = Inf;
+        end
+
+        % Find first button press after stimulus
+        bp = bp_samples(bp_samples > start_samples(m) & ...
+                        bp_samples < next_start);
+
+        if ~isempty(bp)
+            rt(t) = (bp(1) - start_samples(m)) / data_p.fsample;
+        end
+    end
+
+    % Identify valid trials using ORIGINAL trial numbers
+    valid_trials = marker_idx > 8 & ...
+                   rt >= 0.1 & rt <= 1.0;
+
+    % Display trial counts
+    fprintf('%s:\n', sub);
+    fprintf('  Stimulus markers: %d\n', numel(start_samples));
+    fprintf('  EEG trials before exclusion: %d\n', nTrials);
+    fprintf('  Practice trials excluded: %d\n', sum(marker_idx <= 8));
+    fprintf('  RT < 100 ms: %d\n', sum(rt(marker_idx > 8) < 0.1));
+    fprintf('  RT > 1000 ms: %d\n', sum(rt(marker_idx > 8) > 1.0));
+    fprintf('  Missing button presses: %d\n', sum(isnan(rt(marker_idx > 8))));
+    fprintf('  Remaining trials: %d\n', sum(valid_trials));
+
+    % Remove excluded trials
+    cfg.trl = cfg.trl(valid_trials, :);
+
+    % Segment remaining trials
+    data_t = ft_redefinetrial(cfg, data_p);
 
     %% delete bad components
     
@@ -121,7 +200,7 @@ for i               = 1:length(data)
     EEG                     = fieldtrip2eeglab(data_ti);
     
     % detect and delete artefacts with jointprob
-    % Check for NaNs oder Infs
+    % Check for NaNs or Infs
     if any(isnan(EEG.data(:))) || any(isinf(EEG.data(:)))
         warning('data contains NaNs or Infs – pop_jointprob skipped.');
         continue;
@@ -133,9 +212,6 @@ for i               = 1:length(data)
     % convert back to fieldtrip
     data_tc                 = eeglab2fieldtrip(EEG, 'preprocessing');
     data_tc.label           = orig_labels;
-
-    % How many trials per participant? 
-    all_bad_trials{i}       = sum(EEG.reject.rejjp);
 
     %% check if there are trials left
 
@@ -184,34 +260,20 @@ for i               = 1:length(data)
     
     data_erp            = ft_preprocessing(cfg,data_n);
 
-
-    %% ===== Time-Frequency Analysis =====
-    cfg = [];
-    cfg.method          = 'mtmconvol';
-    cfg.output          = 'pow';
-    cfg.taper           = 'hanning';
-    cfg.foi             = 2:0.5:15;
-    cfg.t_ftimwin       = 2 ./ cfg.foi;
-    cfg.toi             = -1.2:0.01:1.2;
-    cfg.pad             = 'nextpow2';
-    cfg.padtype         = 'zero';
-    TFR{i}              = ft_freqanalysis(cfg, data_erp);
-
     %% average pre
-    cfg             = [];
-    cfg.latency     = [-1 0];
-    data_pre        = ft_selectdata(cfg, data_erp);
-    
-    % average trials
-    cfg             = [];
-    data_timelock   = ft_timelockanalysis(cfg, data_pre);
+    cfg                 = [];
+    cfg.latency         = [-1 0];
+    data_pre            = ft_selectdata(cfg, data_erp);
 
-    %% aperiodic pre 
+    % Average trials before spectral analysis, as in the main analysis
+    cfg                 = [];
+    data_timelock       = ft_timelockanalysis(cfg, data_pre);
 
+    %% aperiodic pre
     cfg                         = [];
     cfg.fooof.aperiodic_mode    = 'knee';
-    cfg.foilim                  = [1 40]; 
-    cfg.tapsmofrq               = 4; 
+    cfg.foilim                  = [1 40];
+    cfg.tapsmofrq               = 2;
     cfg.pad                     = 4;
     cfg.method                  = 'mtmfft';
     cfg.output                  = 'fooof_aperiodic';
@@ -221,30 +283,28 @@ for i               = 1:length(data)
     cfg.output                  = 'pow';
     original                    = ft_freqanalysis(cfg, data_timelock);
 
-    % subtract the fractal component from the power spectrum
+    % Subtract the aperiodic spectrum at each channel
     cfg                         = [];
     cfg.parameter               = 'powspctrm';
     cfg.operation               = 'x2-x1';
     oscillatory                 = ft_math(cfg, fractal, original);
 
-    freq_pre{i} = oscillatory;
+    freq_pre{i}                 = oscillatory;
 
     %% average post
-
     cfg                         = [];
-    cfg.latency = [0 1];
+    cfg.latency                 = [0 1];
     data_post                   = ft_selectdata(cfg, data_erp);
-    
-    % average trials
+
+    % Average trials before spectral analysis, as in the main analysis
     cfg                         = [];
     data_timelock               = ft_timelockanalysis(cfg, data_post);
 
     %% aperiodic post
-
     cfg                         = [];
     cfg.fooof.aperiodic_mode    = 'knee';
-    cfg.foilim                  = [1 40]; 
-    cfg.tapsmofrq               = 4; 
+    cfg.foilim                  = [1 40];
+    cfg.tapsmofrq               = 2;
     cfg.pad                     = 4;
     cfg.method                  = 'mtmfft';
     cfg.output                  = 'fooof_aperiodic';
@@ -254,23 +314,31 @@ for i               = 1:length(data)
     cfg.output                  = 'pow';
     original                    = ft_freqanalysis(cfg, data_timelock);
 
-    % subtract the fractal component from the power spectrum
+    % Subtract the aperiodic spectrum at each channel
     cfg                         = [];
     cfg.parameter               = 'powspctrm';
     cfg.operation               = 'x2-x1';
     oscillatory                 = ft_math(cfg, fractal, original);
 
-    freq_post{i}                = oscillatory; 
+    freq_post{i}                = oscillatory;
 
 end
 
-save('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace.mat');
+% Store only the data required for the topographical figures
+workspace_file = [PATHOUT 'topoplot_workspace_2Hz_RTfiltered.mat'];
+save(workspace_file, 'data', 'freq_pre', 'freq_post', '-v7.3');
+
+% Check the number of complete spectra against the main EEG cohort
+complete = ~cellfun(@isempty, freq_pre) & ~cellfun(@isempty, freq_post);
+fprintf('Complete channel-wise pre/post spectra: %d of %d\n', sum(complete), numel(main_ids));
+assert(sum(complete) == numel(main_ids), ...
+    'The number of valid topography datasets differs from the main EEG analysis.');
 
 %% ------------------------------------------------------------
 %  THETA
 % ------------------------------------------------------------
 
-load("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace.mat");
+load("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace_2Hz_RTfiltered.mat");
 T_merged = readtable("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\00_bids\participants.tsv", 'Delimiter', '\t', 'FileType','text');
 
 used_ids = cellfun(@(x) x(1:end-4), {data.name}, 'UniformOutput',false);
@@ -280,9 +348,21 @@ freq_pre  = freq_pre(valid_idx);
 freq_post = freq_post(valid_idx);
 used_ids  = used_ids(valid_idx);
 
-freq_pre([49,60,70]) = [];
-freq_post([49,60,70]) = [];
-used_ids([49,60,70])  = [];
+% Select only the 96 participants from the revised main EEG analysis
+main_results = load('C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\02_fooof_pvt\fooofed.mat', ...
+    'results_pre', 'results_post');
+main_ids = string({main_results.results_pre.id});
+main_ids = main_ids(strlength(main_ids) > 0);
+keep_idx = ismember(string(used_ids), main_ids);
+freq_pre = freq_pre(keep_idx);
+freq_post = freq_post(keep_idx);
+used_ids = used_ids(keep_idx);
+
+assert(numel(used_ids) == numel(main_ids) && ...
+       numel(unique(string(used_ids))) == numel(used_ids), ...
+       'The plotted cohort does not match the revised main EEG analysis.');
+assert(all(ismember(string(used_ids), string(T_merged.participant_id))), ...
+       'Some EEG participants are missing from participants.tsv.');
 
 [~,idx] = ismember(used_ids,T_merged.participant_id);
 group_labels = T_merged.group_Fatigue(idx);
@@ -384,6 +464,14 @@ set(h,...
     'FontName','Arial',...
     'FontSize',14);
 
+% Increase all font sizes by 30%
+font_objects = findall(gcf, '-property', 'FontSize');
+
+for k = 1:numel(font_objects)
+    font_objects(k).FontSize = ...
+        font_objects(k).FontSize * 1.3;
+end
+
 % Export
 set(gcf,'Units','pixels','Position',[100 100 2500 1800])
 
@@ -465,6 +553,14 @@ ylabel(h,'Power (\muV^2)',...
 set(h,...
     'FontName','Arial',...
     'FontSize',14);
+
+% Increase all font sizes by 30%
+font_objects = findall(gcf, '-property', 'FontSize');
+
+for k = 1:numel(font_objects)
+    font_objects(k).FontSize = ...
+        font_objects(k).FontSize * 1.3;
+end
 
 % Export
 set(gcf,'Units','pixels','Position',[100 100 2500 1800])
