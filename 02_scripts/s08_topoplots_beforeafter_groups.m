@@ -325,7 +325,7 @@ for i               = 1:length(data)
 end
 
 % Store only the data required for the topographical figures
-workspace_file = [PATHOUT 'topoplot_workspace_2Hz_RTfiltered.mat'];
+workspace_file = [PATHOUT 'topoplot_workspace.mat'];
 save(workspace_file, 'data', 'freq_pre', 'freq_post', '-v7.3');
 
 % Check the number of complete spectra against the main EEG cohort
@@ -338,7 +338,7 @@ assert(sum(complete) == numel(main_ids), ...
 %  THETA
 % ------------------------------------------------------------
 
-load("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace_2Hz_RTfiltered.mat");
+load("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\topoplot_workspace.mat");
 T_merged = readtable("C:\Users\chris\Desktop\EPOC\EPOC-Kiel\01_data\00_bids\participants.tsv", 'Delimiter', '\t', 'FileType','text');
 
 used_ids = cellfun(@(x) x(1:end-4), {data.name}, 'UniformOutput',false);
