@@ -12,7 +12,7 @@ merged_clean <- readr::read_tsv("C:/Users/chris/Desktop/EPOC/EPOC-Kiel/01_data/0
 eeg_vars  <- c("theta_peak_power_Pre","alpha_peak_power_Pre",
                "theta_peak_power_Post","alpha_peak_power_Post")
 test_vars <- c("facit_f_FS","hads_d_total_score","hads_a_total_score","psqi_total_score",
-               "pvt_reaction_time","nback_miss_1","tmt_a_time","tmt_b_time","moca")
+               "pvt_reaction_time", "moca")
 
 merged_clean[eeg_vars] <- lapply(merged_clean[eeg_vars], function(x) as.numeric(as.character(x)))
 merged_clean[test_vars] <- lapply(merged_clean[test_vars], function(x) as.numeric(as.character(x)))
@@ -244,3 +244,13 @@ ggsave(
   units = "mm",
   dpi = 600
 )
+
+ggsave(
+  "C:/Users/chris/Desktop/EPOC/EPOC-Kiel/03_figures/06_eeg_peaks/Figure 3.png",
+  plot = combined_plot,
+  width = 210,
+  height = 180,
+  units = "mm",
+  dpi = 600
+)
+ 
