@@ -479,6 +479,8 @@ exportgraphics(gcf,...
 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\topo_theta.pdf',...
 'Resolution',600)
 
+exportgraphics(gcf, 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\Figure_5.png', 'Resolution', 600);
+
 %% ------------------------------------------------------------
 %  ALPHA
 % ------------------------------------------------------------
@@ -568,3 +570,5 @@ set(gcf,'Units','pixels','Position',[100 100 2500 1800])
 exportgraphics(gcf,...
 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\topo_alpha.pdf',...
 'Resolution',600)
+
+exportgraphics(gcf, 'C:\Users\chris\Desktop\EPOC\EPOC-Kiel\03_figures\06_eeg_peaks\Figure_6.png', 'Resolution', 600);
